@@ -1,14 +1,35 @@
 ﻿@page "/rooms"
-@inject AppDbContext Context
+@inject ISender Sender
 
-<h3>Room List Page</h3>
-<p>Rooms in list: @count</p>
+<h3 class="mb-5">Room List Page</h3>
+
+@if (_rooms is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table table-">
+        <thead><tr><th>Id</th><th>Room No</th><th>Num of Beds</th></tr></thead>
+        <tbody>
+            @foreach (var room in _rooms)
+            {
+                <tr>
+                    <td>@room.Id</td>
+                    <td>@room.RoomNo</td>
+                    <td>@room.NumOfBeds</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 
 @code {
-    private int count;
+    private IEnumerable<RoomListModel>? _rooms;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        count = Context.Rooms.Count();
+        _rooms = await Sender.Send(new GetRoomsRequest());
     }
 }

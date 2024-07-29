@@ -10,6 +10,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddFakeData();
+builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 
