@@ -1,0 +1,14 @@
+﻿@page "/rooms"
+@inject AppDbContext Context
+
+<h3>Room List Page</h3>
+<p>Rooms in list: @count</p>
+
+@code {
+    private int count;
+
+    protected override void OnInitialized()
+    {
+        count = Context.Rooms.Count();
+    }
+}

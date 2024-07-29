@@ -1,3 +1,4 @@
+using Hotel.FakeData;
 using Hotel.UI;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -8,4 +9,13 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-await builder.Build().RunAsync();
+builder.Services.AddFakeData();
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    SeedData.Seed(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+}
+
+await app.RunAsync();
