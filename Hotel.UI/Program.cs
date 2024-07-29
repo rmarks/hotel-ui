@@ -1,5 +1,5 @@
-using Hotel.FakeData;
 using Hotel.UI;
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -11,6 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddFakeData();
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 

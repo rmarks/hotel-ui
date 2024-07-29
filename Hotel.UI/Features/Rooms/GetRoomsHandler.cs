@@ -17,6 +17,7 @@ public class GetRoomsHandler : IRequestHandler<GetRoomsRequest, IEnumerable<Room
     {
         return await _db.Rooms
             .AsNoTracking()
+            .OrderBy(r => r.RoomNo)
             .Select(r => new RoomListModel(r.Id, r.RoomNo, r.NumOfBeds))
             .ToListAsync();
     }

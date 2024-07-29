@@ -1,7 +1,7 @@
 ﻿@page "/rooms"
 @inject ISender Sender
 
-<h3 class="mb-5">Room List Page</h3>
+<h2 class="mt-3 mb-4 text-center">Hotellitoad</h2>
 
 @if (_rooms is null)
 {
@@ -9,15 +9,28 @@
 }
 else
 {
-    <table class="table table-">
-        <thead><tr><th>Id</th><th>Room No</th><th>Num of Beds</th></tr></thead>
+    <a href="/rooms/add" class="btn btn-primary mb-4">Lisa</a>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th width="20%">Toa nr.</th>
+                <th width="20%" class="text-end">Kohtade arv</th>
+                <th width="30%" class="text-end">Hind</th>
+                <th></th>
+            </tr>
+        </thead>
         <tbody>
             @foreach (var room in _rooms)
             {
                 <tr>
-                    <td>@room.Id</td>
                     <td>@room.RoomNo</td>
-                    <td>@room.NumOfBeds</td>
+                    <td class="text-end">@room.NumOfBeds</td>
+                    <td></td>
+                    <td class="text-end">
+                        <a href="@($"/rooms/{room.Id}")" class="btn btn-primary">Muuda</a>
+                        <button class="btn btn-danger" @onclick="() => DeleteRoom(room.Id)">Kustuta</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -29,6 +42,21 @@ else
     private IEnumerable<RoomListModel>? _rooms;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadRooms();
+    }
+
+    private async Task DeleteRoom(int id)
+    {
+        bool isSuccess = await Sender.Send(new DeleteRoomRequest(id));
+
+        if (isSuccess)
+        {
+            await LoadRooms();
+        }
+    }
+
+    private async Task LoadRooms()
     {
         _rooms = await Sender.Send(new GetRoomsRequest());
     }
