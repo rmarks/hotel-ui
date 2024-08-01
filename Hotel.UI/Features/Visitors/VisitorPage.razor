@@ -1,0 +1,82 @@
+﻿@page "/visitors/{id:int}"
+@page "/visitors/add"
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavManager
+
+<h2 class="mt-3 mb-5 text-center border-bottom">@(IsNew ? "Lisa külastaja" : "Muuda külastajat")</h2>
+
+@if (_visitor is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="_visitor" OnValidSubmit="SubmitForm">
+        <FluentValidationValidator />
+
+        <div class="row mb-3">
+            <label class="col-2 col-form-label">Eesnimi</label>
+            <div class="col-4">
+                <InputText class="form-control" @bind-Value="_visitor.FirstName" />
+                <ValidationMessage For="() => _visitor.FirstName" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-2 col-form-label">Perenimi</label>
+            <div class="col-4">
+                <InputText class="form-control" @bind-Value="_visitor.LastName" />
+                <ValidationMessage For="() => _visitor.LastName" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-2 col-form-label">Isikukood</label>
+            <div class="col-4">
+                <InputText class="form-control" @bind-Value="_visitor.IdCode" />
+                <ValidationMessage For="() => _visitor.IdCode" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-2 col-form-label">E-post</label>
+            <div class="col-4">
+                <InputText class="form-control" @bind-Value="_visitor.Email" />
+                <ValidationMessage For="() => _visitor.Email" />
+            </div>
+        </div>
+        <div class="mt-5 border-top pt-2">
+            <a href="/visitors" class="btn btn-secondary">Loobu</a>
+            <button type="submit" class="btn btn-primary">Salvesta</button>
+        </div>
+    </EditForm>
+}
+
+
+@code {
+    private VisitorModel? _visitor;
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    private bool IsNew => Id is null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _visitor = IsNew
+            ? new()
+            : await HttpClient.GetFromJsonAsync<VisitorModel>($"/api/visitors/{Id}") ?? throw new Exception("Response body is empty!");
+    }
+
+    private async void SubmitForm()
+    {
+        var httpResponse = IsNew
+            ? await HttpClient.PostAsJsonAsync<VisitorModel>("/api/visitors", _visitor!)
+            : await HttpClient.PutAsJsonAsync<VisitorModel>($"/api/visitors/{Id}", _visitor!);
+
+        httpResponse.EnsureSuccessStatusCode();
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            NavManager.NavigateTo("/visitors");
+        }
+    }
+}

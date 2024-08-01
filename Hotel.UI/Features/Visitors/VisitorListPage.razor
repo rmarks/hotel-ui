@@ -1,0 +1,58 @@
+﻿@page "/visitors"
+
+@inject HttpClient HttpClient
+
+<h2 class="text-center mt-3 mb-4">Külastajad</h2>
+
+@if (_visitors is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <a href="/visitors/add" class="btn btn-primary mb-4">Lisa</a>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th width="30%">Nimi</th>
+                <th width="40%">E-post</th>
+                <th width="30%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var visitor in _visitors)
+            {
+                <tr>
+                    <td>@visitor.Name</td>
+                    <td>@visitor.Email</td>
+                    <td class="text-end">
+                        <a href="@($"/visitors/{visitor.Id}")" class="btn btn-primary">Muuda</a>
+                        <button class="btn btn-danger" @onclick="() => DeleteVisitor(visitor.Id)">Kustuta</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IEnumerable<VisitorListModel>? _visitors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _visitors = await HttpClient.GetFromJsonAsync<IEnumerable<VisitorListModel>>("/api/visitors")
+            ?? throw new Exception("Response body is empty!");
+    }
+
+    private async Task DeleteVisitor(int id)
+    {
+        var httpContext = await HttpClient.DeleteAsync($"/api/visitors/{id}");
+
+        if (httpContext.IsSuccessStatusCode)
+        {
+            await OnInitializedAsync();
+        }
+    }
+}
