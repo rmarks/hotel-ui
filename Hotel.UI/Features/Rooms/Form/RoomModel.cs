@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Hotel.UI.Features.Rooms;
+namespace Hotel.UI.Features.Rooms.Form;
 
 public class RoomModel
 {

@@ -7,7 +7,14 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+if (builder.HostEnvironment.IsDevelopment())
+{
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7100") });
+}
+else
+{
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://rm-hotel-api.azurewebsites.net") });
+}
 
 builder.Services.AddFakeData();
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssemblyContaining<Program>());
